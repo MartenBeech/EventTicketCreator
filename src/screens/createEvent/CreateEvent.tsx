@@ -7,6 +7,7 @@ import { ImageUploader } from "../../components/ImageUploader";
 import { useState } from "react";
 import { NumberInput } from "../../components/NumberInput";
 import { TextArea } from "../../components/TextArea";
+import { DatePicker } from "../../components/DatePicker";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -36,7 +37,7 @@ export const CreateEvent = (props: Props) => {
           <View style={styles.flexWrap}>
             <TextInput title="Title" />
             <TextInput title="Location" />
-            <TextInput title="Start Date" />
+            <DatePicker />
             <TextInput title="End Date" />
             <NumberInput title="Price" suffix="DKK" />
             <TextArea title="Description" />
