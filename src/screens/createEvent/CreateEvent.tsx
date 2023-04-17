@@ -1,7 +1,12 @@
-import { StyleSheet, View, Text, ScrollView } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Image } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
+import { TextInput } from "../../components/TextInput";
+import { ImageUploader } from "../../components/ImageUploader";
+import { useState } from "react";
+import { NumberInput } from "../../components/NumberInput";
+import { TextArea } from "../../components/TextArea";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -14,11 +19,28 @@ interface Props {
 }
 
 export const CreateEvent = (props: Props) => {
+  const [image, setImage] = useState("");
   return (
     <View style={styles.screen}>
       <ScrollView>
         <View style={styles.container}>
-          <Text>Create Event</Text>
+          <Image
+            style={styles.image}
+            source={
+              image
+                ? { uri: image }
+                : require("../../images/ImagePlaceholder.jpg")
+            }
+          />
+          <ImageUploader />
+          <View style={styles.flexWrap}>
+            <TextInput title="Title" />
+            <TextInput title="Location" />
+            <TextInput title="Start Date" />
+            <TextInput title="End Date" />
+            <NumberInput title="Price" suffix="DKK" />
+            <TextArea title="Description" />
+          </View>
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />
@@ -37,5 +59,14 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     alignItems: "center",
+  },
+  flexWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  image: {
+    height: 200,
+    width: "100%",
+    resizeMode: "cover",
   },
 });
