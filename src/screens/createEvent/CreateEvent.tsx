@@ -37,9 +37,8 @@ export const CreateEvent = (props: Props) => {
           <View style={styles.flexWrap}>
             <TextInput title="Title" />
             <TextInput title="Location" />
-            <DatePicker />
+            <TextInput title="Start Date" />
             <TextInput title="End Date" />
-            <NumberInput title="Price" suffix="DKK" />
             <TextArea title="Description" />
           </View>
         </View>
