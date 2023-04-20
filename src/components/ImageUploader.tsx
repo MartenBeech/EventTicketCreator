@@ -15,9 +15,7 @@ export const ImageUploader = () => {
     if (result && result.assets) {
       const data = result.assets[0];
       if (data.uri) {
-        uploadToPinata(
-          "https://i.pcmag.com/imagery/articles/00Cx7vFIetxCuKxQeqPf8mi-63..v1666730631.png"
-        );
+        uploadToPinata(data);
         // pinImage(data.uri);
       }
     }
