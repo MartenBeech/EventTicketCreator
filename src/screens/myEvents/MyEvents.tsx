@@ -9,12 +9,8 @@ import {
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
-import { getStoreValue } from "../../store";
-import { key_address, key_mnemonic, key_username } from "../../constants";
-import { createAssetTransaction } from "../../rest/algorand";
 import { getFileFromPinata } from "../../rest/ipfs";
 import { useState } from "react";
-import { IPFSUrlPrefix } from "../../../env";
 
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyEvents">;
 
@@ -25,13 +21,6 @@ interface Props {
 
 export const MyEvents = (props: Props) => {
   const [image, setImage] = useState("");
-  const logMyChildren = async () => {
-    const response = await createAssetTransaction(
-      "test asset 2",
-      "asset url 2",
-      1001
-    );
-  };
 
   return (
     <View style={styles.screen}>

@@ -1,23 +1,18 @@
-import { StyleSheet, TextInput, View, Text, Pressable } from "react-native";
-import {
-  ImagePickerResult,
-  launchImageLibraryAsync,
-  MediaTypeOptions,
-  launchCameraAsync,
-} from "expo-image-picker";
+import { StyleSheet, View, Text, Pressable } from "react-native";
+import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
 import { useState } from "react";
-import { pinImage, uploadToPinata } from "../rest/ipfs";
+import { uploadFileToPinata } from "../rest/ipfs";
 
 export const ImageUploader = () => {
   const [image, setImage] = useState<any>();
 
-  const submitImage = async (result: ImagePickerResult) => {
+  const selectImage = async () => {
+    const result = await launchImageLibraryAsync({
+      mediaTypes: MediaTypeOptions.Images,
+    });
     if (result && result.assets) {
-      const data = result.assets[0];
-      if (data.uri) {
-        uploadToPinata(data);
-        // pinImage(data.uri);
-      }
+      const asset = result.assets[0];
+      uploadFileToPinata(asset);
     }
   };
 
@@ -26,10 +21,7 @@ export const ImageUploader = () => {
       <Pressable
         style={styles.button}
         onPress={async () => {
-          const result = await launchImageLibraryAsync({
-            mediaTypes: MediaTypeOptions.Images,
-          });
-          submitImage(result);
+          selectImage();
         }}
       >
         <Text style={styles.text}>Upload Image</Text>

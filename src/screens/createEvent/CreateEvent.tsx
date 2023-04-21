@@ -1,13 +1,11 @@
-import { StyleSheet, View, Text, ScrollView, Image } from "react-native";
+import { StyleSheet, View, ScrollView, Image } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { TextInput } from "../../components/TextInput";
 import { ImageUploader } from "../../components/ImageUploader";
 import { useState } from "react";
-import { NumberInput } from "../../components/NumberInput";
 import { TextArea } from "../../components/TextArea";
-import { DatePicker } from "../../components/DatePicker";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
