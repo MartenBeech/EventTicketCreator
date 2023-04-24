@@ -1,10 +1,9 @@
 import axios from "axios";
 import { IPFSJwt, IPFSUrlPrefix } from "../../env";
 import { readAsStringAsync, EncodingType } from "expo-file-system";
-import { ImagePickerAsset } from "expo-image-picker";
 
-export const uploadFileToPinata = async (image: ImagePickerAsset) => {
-  const file = await readAsStringAsync(image.uri, {
+export const uploadFileToPinata = async (imageUri: string) => {
+  const file = await readAsStringAsync(imageUri, {
     encoding: EncodingType.Base64,
   });
   const data = JSON.stringify({ file: file });

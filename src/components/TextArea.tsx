@@ -2,6 +2,7 @@ import { StyleSheet, TextInput as Input, View, Text } from "react-native";
 
 interface TextAreaProps {
   title: string;
+  setState: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const TextArea = (props: TextAreaProps) => {
@@ -14,6 +15,9 @@ export const TextArea = (props: TextAreaProps) => {
         placeholderTextColor="#888"
         multiline
         textAlignVertical="top"
+        onChange={(text) => {
+          props.setState(text.nativeEvent.text);
+        }}
       />
     </View>
   );

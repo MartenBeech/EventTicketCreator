@@ -2,6 +2,7 @@ import { StyleSheet, TextInput as Input, View, Text } from "react-native";
 
 interface TextInputProps {
   title: string;
+  setState: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const TextInput = (props: TextInputProps) => {
@@ -12,6 +13,9 @@ export const TextInput = (props: TextInputProps) => {
         style={styles.input}
         placeholder={props.title}
         placeholderTextColor="#888"
+        onChange={(text) => {
+          props.setState(text.nativeEvent.text);
+        }}
       />
     </View>
   );
