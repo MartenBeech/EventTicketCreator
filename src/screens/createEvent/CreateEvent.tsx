@@ -7,6 +7,10 @@ import { ImageUploader } from "../../components/ImageUploader";
 import { useState } from "react";
 import { TextArea } from "../../components/TextArea";
 import { Button } from "../../components/Button";
+import DatePicker from "react-native-modern-datepicker";
+import { DateTimePickerModal } from "../../components/DateTimePicker";
+import { DateButton } from "../../components/DateButton";
+import { convertUTCToYearMonthDate } from "../../service/dateTime";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -23,8 +27,15 @@ export const CreateEvent = (props: Props) => {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+
   const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
+  const [isStartDateModalVisible, setIsStartDateModalVisible] = useState(false);
+  const [isStartTimeModalVisible, setIsStartTimeModalVisible] = useState(false);
+  const [isEndDateModalVisible, setIsEndDateModalVisible] = useState(false);
+  const [isEndTimeModalVisible, setIsEndTimeModalVisible] = useState(false);
 
   const onSubmit = () => {
     console.log(imageUri);
@@ -37,6 +48,32 @@ export const CreateEvent = (props: Props) => {
 
   return (
     <View style={styles.screen}>
+      <DateTimePickerModal
+        setDateTime={setStartDate}
+        isVisible={isStartDateModalVisible}
+        setIsVisible={setIsStartDateModalVisible}
+        mode="calendar"
+        selectedValue={startDate || convertUTCToYearMonthDate(new Date())}
+      />
+      <DateTimePickerModal
+        setDateTime={setStartTime}
+        isVisible={isStartTimeModalVisible}
+        setIsVisible={setIsStartTimeModalVisible}
+        mode="time"
+      />
+      <DateTimePickerModal
+        setDateTime={setEndDate}
+        isVisible={isEndDateModalVisible}
+        setIsVisible={setIsEndDateModalVisible}
+        mode="calendar"
+        selectedValue={endDate || convertUTCToYearMonthDate(new Date())}
+      />
+      <DateTimePickerModal
+        setDateTime={setEndTime}
+        isVisible={isEndTimeModalVisible}
+        setIsVisible={setIsEndTimeModalVisible}
+        mode="time"
+      />
       <ScrollView>
         <View style={styles.container}>
           <Image
@@ -51,8 +88,26 @@ export const CreateEvent = (props: Props) => {
           <View style={styles.flexWrap}>
             <TextInput title="Title" setState={setTitle} />
             <TextInput title="Location" setState={setLocation} />
-            <TextInput title="Start Date" setState={setStartDate} />
-            <TextInput title="End Date" setState={setEndDate} />
+            <DateButton
+              title="Start Date"
+              value={startDate}
+              setModalVisible={setIsStartDateModalVisible}
+            />
+            <DateButton
+              title="Start Time"
+              value={startTime}
+              setModalVisible={setIsStartTimeModalVisible}
+            />
+            <DateButton
+              title="End Date"
+              value={endDate}
+              setModalVisible={setIsEndDateModalVisible}
+            />
+            <DateButton
+              title="End Time"
+              value={endTime}
+              setModalVisible={setIsEndTimeModalVisible}
+            />
             <TextArea title="Description" setState={setDescription} />
           </View>
           <Button title="Submit" onPress={() => onSubmit()} />
