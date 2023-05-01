@@ -10,7 +10,7 @@ import { Button } from "../../components/Button";
 import {
   DateTimePickerModal,
   dateTimeType,
-} from "../../components/DateTimePicker";
+} from "../../components/DateTimePickerModal";
 import { DateButton } from "../../components/DateButton";
 import {
   convertHourMinuteToUTC,
