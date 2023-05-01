@@ -7,10 +7,17 @@ import {
 } from "react-native";
 import DatePicker from "react-native-modern-datepicker";
 
+export type dateTimeType =
+  | "startDate"
+  | "startTime"
+  | "endDate"
+  | "endTime"
+  | "";
+
 interface Props {
   setDateTime: React.Dispatch<React.SetStateAction<string>>;
   isVisible: boolean;
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalType: React.Dispatch<React.SetStateAction<dateTimeType>>;
   mode: "calendar" | "time";
   selectedValue?: string;
 }
@@ -22,14 +29,14 @@ export const DateTimePickerModal = (props: Props) => {
       transparent={true}
       visible={props.isVisible}
       onRequestClose={() => {
-        props.setIsVisible(false);
+        props.setModalType("");
       }}
     >
       <TouchableOpacity
         style={styles.screen}
         activeOpacity={1}
         onPressOut={() => {
-          props.setIsVisible(false);
+          props.setModalType("");
         }}
       >
         <View style={styles.centeredView}>
@@ -40,11 +47,11 @@ export const DateTimePickerModal = (props: Props) => {
                 minuteInterval={5}
                 onTimeChange={(selectedTime) => {
                   props.setDateTime(selectedTime);
-                  props.setIsVisible(false);
+                  props.setModalType("");
                 }}
                 onDateChange={(selectedDate) => {
                   props.setDateTime(selectedDate);
-                  props.setIsVisible(false);
+                  props.setModalType("");
                 }}
                 selected={props.selectedValue}
               />

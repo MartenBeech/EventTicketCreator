@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, Pressable } from "react-native";
 
 interface Props {
   title: string;
-  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  onPress: () => void;
   value: string;
 }
 
@@ -10,12 +10,7 @@ export const DateButton = (props: Props) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{props.title}</Text>
-      <Pressable
-        style={styles.pressable}
-        onPress={() => {
-          props.setModalVisible(true);
-        }}
-      >
+      <Pressable style={styles.pressable} onPress={props.onPress}>
         {props.value ? (
           <Text>{props.value}</Text>
         ) : (

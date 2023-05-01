@@ -20,12 +20,12 @@
     "expo-file-system": "^15.2.2",
     "expo-image-picker": "^14.1.1",
     "expo-secure-store": "^12.1.1",
-    "expo-splash-screen": "~0.18.1",
+    "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "form-data": "^4.0.0",
     "js-sha512": "^0.8.0",
     "react": "18.2.0",
-    "react-native": "0.71.6",
+    "react-native": "0.71.7",
     "react-native-modern-datepicker": "^1.0.0-beta.91"
   },
   "devDependencies": {
