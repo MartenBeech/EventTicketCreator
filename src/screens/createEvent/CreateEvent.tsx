@@ -12,7 +12,10 @@ import {
   dateTimeType,
 } from "../../components/DateTimePicker";
 import { DateButton } from "../../components/DateButton";
-import { convertUTCToYearMonthDate } from "../../service/dateTime";
+import {
+  convertHourMinuteToUTC,
+  convertYearMonthDateToUTC,
+} from "../../service/dateTime";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -49,33 +52,36 @@ export const CreateEvent = (props: Props) => {
 
   return (
     <View style={styles.screen}>
-      <DateTimePickerModal
-        setDateTime={
-          modalType === "startDate"
-            ? setStartDate
-            : modalType === "startTime"
-            ? setStartTime
-            : modalType === "endDate"
-            ? setEndDate
-            : setEndTime
-        }
-        isVisible={!!modalType}
-        setModalType={setModalType}
-        mode={
-          modalType === "startDate"
-            ? "calendar"
-            : modalType === "endDate"
-            ? "calendar"
-            : "time"
-        }
-        selectedValue={
-          modalType === "startDate"
-            ? startDate || convertUTCToYearMonthDate(new Date())
-            : modalType === "endDate"
-            ? endDate || convertUTCToYearMonthDate(new Date())
-            : undefined
-        }
-      />
+      {modalType && (
+        <DateTimePickerModal
+          setDateTime={
+            modalType === "startDate"
+              ? setStartDate
+              : modalType === "startTime"
+              ? setStartTime
+              : modalType === "endDate"
+              ? setEndDate
+              : setEndTime
+          }
+          setModalType={setModalType}
+          mode={
+            modalType === "startDate"
+              ? "date"
+              : modalType === "endDate"
+              ? "date"
+              : "time"
+          }
+          selectedValue={
+            modalType === "startDate"
+              ? convertYearMonthDateToUTC(startDate)
+              : modalType === "startTime"
+              ? convertHourMinuteToUTC(startTime)
+              : modalType === "endDate"
+              ? convertYearMonthDateToUTC(endDate)
+              : convertHourMinuteToUTC(endTime)
+          }
+        />
+      )}
       <ScrollView>
         <View style={styles.container}>
           <Image
