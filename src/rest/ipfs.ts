@@ -1,8 +1,9 @@
 import axios from "axios";
 import { IPFSJwt, IPFSUrlPrefix } from "../../env";
 import { readAsStringAsync, EncodingType } from "expo-file-system";
+import { TicketEvent } from "../entities/ticketEvent";
 
-export const uploadFileToPinata = async (imageUri: string) => {
+export const uploadFileToPinata = async (imageUri: string): Promise<string> => {
   const file = await readAsStringAsync(imageUri, {
     encoding: EncodingType.Base64,
   });
@@ -18,13 +19,14 @@ export const uploadFileToPinata = async (imageUri: string) => {
         },
       }
     );
-    console.log(res.data);
+    return res.data.IpfsHash;
   } catch (err) {
     if (axios.isAxiosError(err)) {
       console.log("Axios request failed", err.response?.data, err.toJSON());
     } else {
       console.error(err);
     }
+    return "";
   }
 };
 
@@ -33,4 +35,30 @@ export const getFileFromPinata = async (IpfsHash: string) => {
   const data = await response.json();
   const file = `data:image;base64,${data.file}`;
   return file;
+};
+
+export const uploadTicketEventToPinata = async (
+  ticketEvent: TicketEvent
+): Promise<string> => {
+  const data = JSON.stringify(ticketEvent);
+  try {
+    const res = await axios.post(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${IPFSJwt}`,
+        },
+      }
+    );
+    return res.data.IpfsHash;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return "";
+  }
 };

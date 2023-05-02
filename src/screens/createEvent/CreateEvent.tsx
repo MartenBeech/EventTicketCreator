@@ -11,6 +11,11 @@ import DatePicker from "react-native-modern-datepicker";
 import { DateTimePickerModal } from "../../components/DateTimePicker";
 import { DateButton } from "../../components/DateButton";
 import { convertUTCToYearMonthDate } from "../../service/dateTime";
+import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
+import { TicketEvent } from "../../entities/ticketEvent";
+import { getStoreValue } from "../../store";
+import { key_username } from "../../constants";
+import { createAssetTransaction } from "../../rest/algorand";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -37,13 +42,22 @@ export const CreateEvent = (props: Props) => {
   const [isEndDateModalVisible, setIsEndDateModalVisible] = useState(false);
   const [isEndTimeModalVisible, setIsEndTimeModalVisible] = useState(false);
 
-  const onSubmit = () => {
-    console.log(imageUri);
-    console.log(title);
-    console.log(location);
-    console.log(startDate);
-    console.log(endDate);
-    console.log(description);
+  const onSubmit = async () => {
+    console.log("Submitting");
+    const IpfsCid = await uploadFileToPinata(imageUri);
+    const ticketEvent: TicketEvent = {
+      creatorName: await getStoreValue(key_username),
+      description,
+      endDate,
+      imageUrl: IpfsCid,
+      location,
+      price: 0,
+      startDate,
+      title,
+    };
+    const eventCID = await uploadTicketEventToPinata(ticketEvent);
+    console.log(eventCID);
+    createAssetTransaction(title, `ipfs/${eventCID}`, 100);
   };
 
   return (
