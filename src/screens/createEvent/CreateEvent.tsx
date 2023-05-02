@@ -7,15 +7,20 @@ import { ImageUploader } from "../../components/ImageUploader";
 import { useState } from "react";
 import { TextArea } from "../../components/TextArea";
 import { Button } from "../../components/Button";
-import DatePicker from "react-native-modern-datepicker";
-import { DateTimePickerModal } from "../../components/DateTimePicker";
+import {
+  DateTimePickerModal,
+  dateTimeType,
+} from "../../components/DateTimePickerModal";
 import { DateButton } from "../../components/DateButton";
-import { convertUTCToYearMonthDate } from "../../service/dateTime";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
 import { getStoreValue } from "../../store";
 import { key_username } from "../../constants";
 import { createAssetTransaction } from "../../rest/algorand";
+import {
+  convertHourMinuteToUTC,
+  convertYearMonthDateToUTC,
+} from "../../service/dateTime";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -33,14 +38,11 @@ export const CreateEvent = (props: Props) => {
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
-
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
-  const [isStartDateModalVisible, setIsStartDateModalVisible] = useState(false);
-  const [isStartTimeModalVisible, setIsStartTimeModalVisible] = useState(false);
-  const [isEndDateModalVisible, setIsEndDateModalVisible] = useState(false);
-  const [isEndTimeModalVisible, setIsEndTimeModalVisible] = useState(false);
+
+  const [modalType, setModalType] = useState<dateTimeType>("");
 
   const onSubmit = async () => {
     console.log("Submitting");
@@ -62,32 +64,36 @@ export const CreateEvent = (props: Props) => {
 
   return (
     <View style={styles.screen}>
-      <DateTimePickerModal
-        setDateTime={setStartDate}
-        isVisible={isStartDateModalVisible}
-        setIsVisible={setIsStartDateModalVisible}
-        mode="calendar"
-        selectedValue={startDate || convertUTCToYearMonthDate(new Date())}
-      />
-      <DateTimePickerModal
-        setDateTime={setStartTime}
-        isVisible={isStartTimeModalVisible}
-        setIsVisible={setIsStartTimeModalVisible}
-        mode="time"
-      />
-      <DateTimePickerModal
-        setDateTime={setEndDate}
-        isVisible={isEndDateModalVisible}
-        setIsVisible={setIsEndDateModalVisible}
-        mode="calendar"
-        selectedValue={endDate || convertUTCToYearMonthDate(new Date())}
-      />
-      <DateTimePickerModal
-        setDateTime={setEndTime}
-        isVisible={isEndTimeModalVisible}
-        setIsVisible={setIsEndTimeModalVisible}
-        mode="time"
-      />
+      {modalType && (
+        <DateTimePickerModal
+          setDateTime={
+            modalType === "startDate"
+              ? setStartDate
+              : modalType === "startTime"
+              ? setStartTime
+              : modalType === "endDate"
+              ? setEndDate
+              : setEndTime
+          }
+          setModalType={setModalType}
+          mode={
+            modalType === "startDate"
+              ? "date"
+              : modalType === "endDate"
+              ? "date"
+              : "time"
+          }
+          selectedValue={
+            modalType === "startDate"
+              ? convertYearMonthDateToUTC(startDate)
+              : modalType === "startTime"
+              ? convertHourMinuteToUTC(startTime)
+              : modalType === "endDate"
+              ? convertYearMonthDateToUTC(endDate)
+              : convertHourMinuteToUTC(endTime)
+          }
+        />
+      )}
       <ScrollView>
         <View style={styles.container}>
           <Image
@@ -105,22 +111,22 @@ export const CreateEvent = (props: Props) => {
             <DateButton
               title="Start Date"
               value={startDate}
-              setModalVisible={setIsStartDateModalVisible}
+              onPress={() => setModalType("startDate")}
             />
             <DateButton
               title="Start Time"
               value={startTime}
-              setModalVisible={setIsStartTimeModalVisible}
+              onPress={() => setModalType("startTime")}
             />
             <DateButton
               title="End Date"
               value={endDate}
-              setModalVisible={setIsEndDateModalVisible}
+              onPress={() => setModalType("endDate")}
             />
             <DateButton
               title="End Time"
               value={endTime}
-              setModalVisible={setIsEndTimeModalVisible}
+              onPress={() => setModalType("endTime")}
             />
             <TextArea title="Description" setState={setDescription} />
           </View>
