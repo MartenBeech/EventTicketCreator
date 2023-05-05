@@ -4,10 +4,12 @@ import { View } from "react-native";
 import { MyEvents } from "./screens/myEvents/MyEvents";
 import { CreateEvent } from "./screens/createEvent/CreateEvent";
 import { IdentifierModal } from "./components/IdentifierModal";
+import { TicketEventAssetId } from "./entities/ticketEvent";
 
 export type RootStackParamList = {
   MyEvents: undefined;
   CreateEvent: undefined;
+  Event: { ticketEventAssetId: TicketEventAssetId };
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();

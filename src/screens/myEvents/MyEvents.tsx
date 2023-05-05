@@ -1,16 +1,20 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  Button,
-  Image,
-} from "react-native";
+import { StyleSheet, View, ScrollView, Pressable } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
-import { getFileFromPinata } from "../../rest/ipfs";
-import { useState } from "react";
+import { getIPFSEventData } from "../../rest/ipfs";
+import { useEffect, useState } from "react";
+import { TicketEventAssetId } from "../../entities/ticketEvent";
+import {
+  getAssetIdsFromAccount,
+  getManagerFromAssetId,
+  getUrlFromAssetId,
+} from "../../rest/algorand";
+import { smartContractAccountAddr } from "../../../env";
+import { getStoreValue } from "../../store";
+import { key_address } from "../../constants";
+import { EventBox } from "../../components/EventBox";
+import { useIsFocused } from "@react-navigation/native";
 
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyEvents">;
 
@@ -20,31 +24,69 @@ interface Props {
 }
 
 export const MyEvents = (props: Props) => {
-  const [image, setImage] = useState("");
+  const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const getAssetUrlsFromAccount = async () => {
+      const address = await getStoreValue(key_address);
+      const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
+
+      const assetIdManagers = await Promise.all(
+        assetIds.map(async (assetId) => {
+          return { manager: await getManagerFromAssetId(assetId), id: assetId };
+        })
+      );
+      const filteredAssetIds = assetIdManagers
+        .filter((assetIdManager) => address === assetIdManager.manager)
+        .map((assetIdManager) => {
+          return assetIdManager.id;
+        });
+
+      const assets = await Promise.all(
+        filteredAssetIds.map(async (assetId) => {
+          return { url: await getUrlFromAssetId(assetId), id: assetId };
+        })
+      );
+      const events = await Promise.all(
+        assets.map(async (asset) => {
+          return {
+            ticketEvent: await getIPFSEventData(asset.url),
+            assetId: asset.id,
+          };
+        })
+      );
+      console.log(events);
+      setEvents(events);
+    };
+    getAssetUrlsFromAccount();
+  }, [isFocused]);
 
   return (
     <View style={styles.screen}>
       <ScrollView>
         <View style={styles.container}>
-          <Text>My Events</Text>
-          <Button
-            title="Click Me"
-            onPress={async () => {
-              setImage(
-                await getFileFromPinata(
-                  "QmVkTTyAtX55uMtHaxEjovp7PXRrkKxVYzujbE4PiXa9ed"
-                )
-              );
-            }}
-          ></Button>
-          <Image
-            style={styles.image}
-            source={
-              image
-                ? { uri: image }
-                : require("../../images/ImagePlaceholder.jpg")
-            }
-          />
+          {events.map((event, index) => {
+            const ticketEvent = event.ticketEvent;
+            return (
+              <Pressable
+                key={`${ticketEvent.title}-${index}`}
+                style={styles.button}
+                onPress={() => {
+                  props.navigation.navigate("Event", {
+                    ticketEventAssetId: { ticketEvent, assetId: event.assetId },
+                  });
+                }}
+              >
+                <EventBox
+                  imageUrl={ticketEvent.imageUrl}
+                  title={ticketEvent.title}
+                  date={ticketEvent.startDate}
+                  location={ticketEvent.location}
+                />
+              </Pressable>
+            );
+          })}
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

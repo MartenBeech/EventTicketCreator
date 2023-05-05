@@ -13,6 +13,7 @@ import { getStoreValue, setStorePair } from "../store";
 import { key_address, key_mnemonic } from "../constants";
 import {
   appId,
+  indexerUrl,
   purestakeAPIKey,
   purestakeBaseServer,
   walletAddress,
@@ -154,4 +155,100 @@ export const getAlgoTransaction = async () => {
     }
     return false;
   }
+};
+
+interface Asset {
+  amount: number;
+  "asset-id": number;
+  deleted: boolean;
+  "is-frozen": boolean;
+  "opted-in-at-round": number;
+}
+
+const getAssetDataFromAccount = async (accountAddr: string) => {
+  try {
+    const response = await axios.get(
+      `${indexerUrl}/accounts/${accountAddr}/assets`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const assets: Asset[] = response.data.assets;
+
+    return assets;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return [];
+  }
+};
+
+export const getAssetIdsFromAccount = async (accountAddr: string) => {
+  const assets = await getAssetDataFromAccount(accountAddr);
+  const assetIds = assets.map((asset) => {
+    return asset["asset-id"];
+  });
+  return assetIds;
+};
+
+export const getAssetAmountFromAccount = async (
+  accountAddr: string,
+  assetId: number
+) => {
+  const assets = await getAssetDataFromAccount(accountAddr);
+
+  const asset = assets.find((asset) => asset["asset-id"] === assetId);
+  if (asset) {
+    return asset.amount;
+  }
+  return -1;
+};
+
+export const getAssetParams = async (assetId: number) => {
+  try {
+    const response = await axios.get(`${indexerUrl}/assets/${assetId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data.asset.params;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return "";
+  }
+};
+
+export const getUrlFromAssetId = async (assetId: number): Promise<string> => {
+  const assetParams = await getAssetParams(assetId);
+  if (assetParams) {
+    return assetParams.url;
+  }
+  return "";
+};
+
+export const getManagerFromAssetId = async (
+  assetId: number
+): Promise<string> => {
+  const assetParams = await getAssetParams(assetId);
+  if (assetParams) {
+    return assetParams.manager;
+  }
+  return "";
+};
+
+export const getTotalFromAsset = async (assetId: number): Promise<number> => {
+  const assetParams = await getAssetParams(assetId);
+  if (assetParams) {
+    return assetParams.total;
+  }
+  return -1;
 };
