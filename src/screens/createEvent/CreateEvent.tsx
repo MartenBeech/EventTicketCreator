@@ -15,7 +15,7 @@ import { DateButton } from "../../components/DateButton";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
 import { getStoreValue } from "../../store";
-import { key_username } from "../../constants";
+import { key_address, key_username } from "../../constants";
 import { createAssetTransaction } from "../../rest/algorand";
 import {
   convertHourMinuteToUTC,
@@ -48,7 +48,7 @@ export const CreateEvent = (props: Props) => {
     console.log("Submitting");
     const IpfsCid = await uploadFileToPinata(imageUri);
     const ticketEvent: TicketEvent = {
-      creatorName: await getStoreValue(key_username),
+      creatorName: await getStoreValue(key_address),
       description,
       endDate,
       imageUrl: IpfsCid,

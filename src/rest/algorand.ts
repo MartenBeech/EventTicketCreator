@@ -3,6 +3,7 @@ import algosdk, {
   secretKeyToMnemonic,
   OnApplicationComplete,
   TransactionType,
+  signTransaction,
 } from "algosdk";
 import axios from "axios";
 import { getRandomBytes } from "expo-crypto";
@@ -10,11 +11,14 @@ import { Buffer } from "buffer";
 import { sha512_256 } from "js-sha512";
 import { getStoreValue, setStorePair } from "../store";
 import { key_address, key_mnemonic } from "../constants";
-import { appId, purestakeAPIKey, purestakeBaseServer } from "../../env";
 import {
-  base64ToArrayBuffer,
-  convertStringToUint8Array,
-} from "../service/encode";
+  appId,
+  purestakeAPIKey,
+  purestakeBaseServer,
+  walletAddress,
+  walletMnemonic,
+} from "../../env";
+import { convertStringToUint8Array } from "../service/encode";
 
 export const createAccount = async () => {
   const privateKeyBytes = getRandomBytes(32);
@@ -91,6 +95,50 @@ export const createAssetTransaction = async (
       }
     );
     console.log("Transaction sent:");
+    console.log(txId);
+    return true;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return false;
+  }
+};
+
+export const getAlgoTransaction = async () => {
+  const transactionParams = await getTransactionParams();
+  const algorandAddress = await getStoreValue(key_address);
+  const mnemonic = walletMnemonic;
+
+  const txn: TransactionLike = {
+    flatFee: true,
+    from: walletAddress,
+    to: algorandAddress,
+    fee: transactionParams["min-fee"],
+    amount: 200000,
+    firstRound: transactionParams["last-round"] + 1,
+    lastRound: transactionParams["last-round"] + 1000,
+    genesisID: transactionParams["genesis-id"],
+    genesisHash: transactionParams["genesis-hash"],
+  };
+
+  const account = algosdk.mnemonicToSecretKey(mnemonic);
+
+  const signedTxn = signTransaction(txn, account.sk);
+  try {
+    const { data: txId } = await axios.post(
+      `${purestakeBaseServer}/transactions`,
+      signedTxn.blob,
+      {
+        headers: {
+          "Content-Type": "application/x-binary",
+          "X-API-key": purestakeAPIKey,
+        },
+      }
+    );
+    console.log(`Transaction sent:`);
     console.log(txId);
     return true;
   } catch (err) {

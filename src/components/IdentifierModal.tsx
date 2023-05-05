@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { key_mnemonic, key_username } from "../constants";
-import { createAccount } from "../rest/algorand";
+import { createAccount, getAlgoTransaction } from "../rest/algorand";
 import { getStoreValue, setStorePair } from "../store";
 
 export const IdentifierModal = () => {
@@ -17,7 +17,7 @@ export const IdentifierModal = () => {
 
   useEffect(() => {
     getStoreValue(key_mnemonic).then(async (mnemonic) => {
-      setModalVisible(!mnemonic);
+      setModalVisible(!!mnemonic);
     });
   }, []);
 
@@ -46,8 +46,10 @@ export const IdentifierModal = () => {
               if (username.length < 3 || username.length > 20) {
                 alert("Username has to be between 3-20 characters");
               } else {
-                await createAccount();
+                const account = await createAccount();
+                console.log(account);
                 setStorePair(key_username, username);
+                getAlgoTransaction();
 
                 setModalVisible(false);
               }
