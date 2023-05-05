@@ -16,5 +16,5 @@ export const ImageUploader = (props: Props) => {
     }
   };
 
-  return <Button onPress={() => selectImage()} title="Upload Image" />;
+  return <Button onPress={() => selectImage()} title="Upload Image *" />;
 };

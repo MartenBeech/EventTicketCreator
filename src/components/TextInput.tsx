@@ -3,12 +3,15 @@ import { StyleSheet, TextInput as Input, View, Text } from "react-native";
 interface TextInputProps {
   title: string;
   setState: React.Dispatch<React.SetStateAction<string>>;
+  required?: boolean;
 }
 
 export const TextInput = (props: TextInputProps) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{props.title}</Text>
+      <Text style={styles.text}>{`${props.title}${
+        props.required ? " *" : ""
+      }`}</Text>
       <Input
         style={styles.input}
         placeholder={props.title}

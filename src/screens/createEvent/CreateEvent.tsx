@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Image } from "react-native";
+import { StyleSheet, View, ScrollView, Image, Text } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
@@ -15,12 +15,14 @@ import { DateButton } from "../../components/DateButton";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
 import { getStoreValue } from "../../store";
-import { key_address, key_username } from "../../constants";
+import { key_address } from "../../constants";
 import { createAssetTransaction } from "../../rest/algorand";
 import {
   convertHourMinuteToUTC,
   convertYearMonthDateToUTC,
 } from "../../service/dateTime";
+import { Snackbar, SnackbarColor } from "../../components/Snackbar";
+import { Spinner } from "../../components/Spinner";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -43,10 +45,24 @@ export const CreateEvent = (props: Props) => {
   const [description, setDescription] = useState("");
 
   const [modalType, setModalType] = useState<dateTimeType>("");
+  const [snackBarText, setSnackBarText] = useState("");
+  const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async () => {
-    console.log("Submitting");
+    if (!imageUri || !title) {
+      setSnackBarColor("red");
+      setSnackBarText("Required field(s) missing");
+      return;
+    }
+    setIsLoading(true);
     const IpfsCid = await uploadFileToPinata(imageUri);
+    if (!IpfsCid) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed uploading image to Pinata");
+      setIsLoading(false);
+      return;
+    }
     const ticketEvent: TicketEvent = {
       creatorName: await getStoreValue(key_address),
       description,
@@ -58,12 +74,27 @@ export const CreateEvent = (props: Props) => {
       title,
     };
     const eventCID = await uploadTicketEventToPinata(ticketEvent);
+    if (!eventCID) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed uploading event to Pinata");
+      setIsLoading(false);
+      return;
+    }
     console.log(eventCID);
     createAssetTransaction(title, `ipfs/${eventCID}`, 100);
+    setSnackBarColor("green");
+    setSnackBarText("Succesfully submitted event");
+    setIsLoading(false);
   };
 
   return (
     <View style={styles.screen}>
+      {isLoading && <Spinner />}
+      <Snackbar
+        textState={snackBarText}
+        setTextState={setSnackBarText}
+        backgroundColor={snackBarColor}
+      />
       {modalType && (
         <DateTimePickerModal
           setDateTime={
@@ -106,7 +137,7 @@ export const CreateEvent = (props: Props) => {
           />
           <ImageUploader setImageUri={setImageUri} />
           <View style={styles.flexWrap}>
-            <TextInput title="Title" setState={setTitle} />
+            <TextInput title="Title" setState={setTitle} required />
             <TextInput title="Location" setState={setLocation} />
             <DateButton
               title="Start Date"
