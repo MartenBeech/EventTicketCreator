@@ -81,7 +81,17 @@ export const CreateEvent = (props: Props) => {
       return;
     }
     console.log(eventCID);
-    createAssetTransaction(title, `ipfs/${eventCID}`, 100);
+    const createAssetTransactionResult = await createAssetTransaction(
+      title,
+      `ipfs/${eventCID}`,
+      100
+    );
+    if (!createAssetTransactionResult) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed creating asset transaction");
+      setIsLoading(false);
+      return;
+    }
     setSnackBarColor("green");
     setSnackBarText("Succesfully submitted event");
     setIsLoading(false);

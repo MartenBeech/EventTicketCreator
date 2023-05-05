@@ -50,12 +50,16 @@ export const createAssetTransaction = async (
   const algorandAddress = await getStoreValue(key_address);
   const mnemonic = await getStoreValue(key_mnemonic);
 
-  const hash = sha512_256("create_asset(string,string,uint64,byte[32])void");
+  const hash = sha512_256(
+    "create_asset(string,string,uint64,address,byte[32])void"
+  );
   const methodSelector = Buffer.from(hash.slice(0, 8), "hex");
 
   const assetNameEncoded = convertStringToUint8Array(assetName);
   const assetUrlEncoded = convertStringToUint8Array(assetUrl);
   const assetTotalEncoded = algosdk.encodeUint64(assetTotal);
+  const creatorAddressEncoded =
+    algosdk.decodeAddress(algorandAddress).publicKey;
   const metaData = algosdk.decodeAddress(algorandAddress).publicKey;
 
   const assetNamePrefix = [0, assetNameEncoded.length];
@@ -77,6 +81,7 @@ export const createAssetTransaction = async (
       new Uint8Array([...assetNamePrefix, ...assetNameEncoded]),
       new Uint8Array([...assetUrlPrefix, ...assetUrlEncoded]),
       assetTotalEncoded,
+      creatorAddressEncoded,
       metaData,
     ],
   };
@@ -94,7 +99,7 @@ export const createAssetTransaction = async (
         },
       }
     );
-    console.log("Transaction sent:");
+    console.log("createAssetTransaction:");
     console.log(txId);
     return true;
   } catch (err) {
@@ -138,7 +143,7 @@ export const getAlgoTransaction = async () => {
         },
       }
     );
-    console.log(`Transaction sent:`);
+    console.log(`getAlgoTransaction:`);
     console.log(txId);
     return true;
   } catch (err) {

@@ -17,7 +17,7 @@ export const IdentifierModal = () => {
 
   useEffect(() => {
     getStoreValue(key_mnemonic).then(async (mnemonic) => {
-      setModalVisible(!!mnemonic);
+      setModalVisible(!mnemonic);
     });
   }, []);
 
