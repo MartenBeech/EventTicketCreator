@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable, Text } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
@@ -15,6 +15,7 @@ import { getStoreValue } from "../../store";
 import { key_address } from "../../constants";
 import { EventBox } from "../../components/EventBox";
 import { useIsFocused } from "@react-navigation/native";
+import { Spinner } from "../../components/Spinner";
 
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyEvents">;
 
@@ -25,45 +26,59 @@ interface Props {
 
 export const MyEvents = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    const getAssetUrlsFromAccount = async () => {
-      const address = await getStoreValue(key_address);
-      const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
+    if (isFocused) {
+      const getAssetUrlsFromAccount = async () => {
+        setIsLoading(true);
+        const address = await getStoreValue(key_address);
+        const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
 
-      const assetIdManagers = await Promise.all(
-        assetIds.map(async (assetId) => {
-          return { manager: await getManagerFromAssetId(assetId), id: assetId };
-        })
-      );
-      const filteredAssetIds = assetIdManagers
-        .filter((assetIdManager) => address === assetIdManager.manager)
-        .map((assetIdManager) => {
-          return assetIdManager.id;
-        });
+        const assetIdManagers = await Promise.all(
+          assetIds.map(async (assetId) => {
+            return {
+              manager: await getManagerFromAssetId(assetId),
+              id: assetId,
+            };
+          })
+        );
+        const filteredAssetIds = assetIdManagers
+          .filter((assetIdManager) => address === assetIdManager.manager)
+          .map((assetIdManager) => {
+            return assetIdManager.id;
+          });
 
-      const assets = await Promise.all(
-        filteredAssetIds.map(async (assetId) => {
-          return { url: await getUrlFromAssetId(assetId), id: assetId };
-        })
-      );
-      const events = await Promise.all(
-        assets.map(async (asset) => {
-          return {
-            ticketEvent: await getIPFSEventData(asset.url),
-            assetId: asset.id,
-          };
-        })
-      );
-      console.log(events);
-      setEvents(events);
-    };
-    getAssetUrlsFromAccount();
+        const assets = await Promise.all(
+          filteredAssetIds.map(async (assetId) => {
+            return { url: await getUrlFromAssetId(assetId), id: assetId };
+          })
+        );
+        const events = await Promise.all(
+          assets.map(async (asset) => {
+            return {
+              ticketEvent: await getIPFSEventData(asset.url),
+              assetId: asset.id,
+            };
+          })
+        );
+        console.log(events);
+        setEvents(events);
+        setIsLoading(false);
+      };
+      getAssetUrlsFromAccount();
+    }
   }, [isFocused]);
 
   return (
     <View style={styles.screen}>
+      {isLoading && <Spinner />}
+      {!events.length && !isLoading && (
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>You have no active events</Text>
+        </View>
+      )}
       <ScrollView>
         <View style={styles.container}>
           {events.map((event, index) => {
@@ -110,5 +125,13 @@ const styles = StyleSheet.create({
     height: 200,
     width: "100%",
     resizeMode: "cover",
+  },
+  textContainer: {
+    height: "90%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    fontSize: 16,
   },
 });

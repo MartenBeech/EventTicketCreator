@@ -15,6 +15,7 @@ import {
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
 import { getFileFromPinata } from "../../rest/ipfs";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -29,21 +30,24 @@ export const Event = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
   const [image, setImage] = useState("");
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const getTicketAmounts = async () => {
-      const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
-      const assetAmount = await getAssetAmountFromAccount(
-        smartContractAccountAddr,
-        ticketEventAssetId.assetId
-      );
-      const fileImage = await getFileFromPinata(ticketEvent.imageUrl);
+    if (isFocused) {
+      const getTicketAmounts = async () => {
+        const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
+        const assetAmount = await getAssetAmountFromAccount(
+          smartContractAccountAddr,
+          ticketEventAssetId.assetId
+        );
+        const fileImage = await getFileFromPinata(ticketEvent.imageUrl);
 
-      setTicketsLeft(assetAmount);
-      setTicketsSold(totalAmount - assetAmount);
-      setImage(fileImage);
-    };
-    getTicketAmounts();
+        setTicketsLeft(assetAmount);
+        setTicketsSold(totalAmount - assetAmount);
+        setImage(fileImage);
+      };
+      getTicketAmounts();
+    }
   }, []);
 
   return (
