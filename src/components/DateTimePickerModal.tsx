@@ -3,6 +3,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   convertUTCToHourMinute,
   convertUTCToYearMonthDate,
+  convertYearMonthDateToUTC,
 } from "../service/dateTime";
 
 export type dateTimeType =
@@ -17,6 +18,7 @@ interface Props {
   setModalType: React.Dispatch<React.SetStateAction<dateTimeType>>;
   mode: "date" | "time";
   selectedValue: Date;
+  startDate?: string;
 }
 
 export const DateTimePickerModal = (props: Props) => {
@@ -25,6 +27,11 @@ export const DateTimePickerModal = (props: Props) => {
       <DateTimePicker
         mode={props.mode}
         minuteInterval={5}
+        minimumDate={
+          props.startDate
+            ? convertYearMonthDateToUTC(props.startDate)
+            : new Date()
+        }
         onChange={(value) => {
           if (value.type === "set") {
             const timestamp = value.nativeEvent.timestamp;

@@ -15,7 +15,7 @@ import { DateButton } from "../../components/DateButton";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
 import { getStoreValue } from "../../store";
-import { key_address } from "../../constants";
+import { key_address, key_username } from "../../constants";
 import { createAssetTransaction } from "../../rest/algorand";
 import {
   convertHourMinuteToUTC,
@@ -63,8 +63,9 @@ export const CreateEvent = (props: Props) => {
       setIsLoading(false);
       return;
     }
+    console.log("Image CID after create event: " + IpfsCid);
     const ticketEvent: TicketEvent = {
-      creatorName: await getStoreValue(key_address),
+      creatorName: await getStoreValue(key_username),
       description,
       endDate,
       imageUrl: IpfsCid,
@@ -74,6 +75,8 @@ export const CreateEvent = (props: Props) => {
       title,
     };
     const eventCID = await uploadTicketEventToPinata(ticketEvent);
+
+    console.log("Event CID after create Event: " + eventCID);
     if (!eventCID) {
       setSnackBarColor("red");
       setSnackBarText("Failed uploading event to Pinata");
@@ -133,6 +136,7 @@ export const CreateEvent = (props: Props) => {
               ? convertYearMonthDateToUTC(endDate)
               : convertHourMinuteToUTC(endTime)
           }
+          startDate={startDate}
         />
       )}
       <ScrollView>

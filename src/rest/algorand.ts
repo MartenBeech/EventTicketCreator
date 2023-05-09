@@ -105,6 +105,7 @@ export const createAssetTransaction = async (
     return true;
   } catch (err) {
     if (axios.isAxiosError(err)) {
+      console.log("Failed in create Asset Transaction")
       console.log("Axios request failed", err.response?.data, err.toJSON());
     } else {
       console.error(err);
