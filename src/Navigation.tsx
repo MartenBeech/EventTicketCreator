@@ -5,6 +5,7 @@ import { MyEvents } from "./screens/myEvents/MyEvents";
 import { CreateEvent } from "./screens/createEvent/CreateEvent";
 import { IdentifierModal } from "./components/IdentifierModal";
 import { TicketEventAssetId } from "./entities/ticketEvent";
+import { Event } from "./screens/myEvents/Event";
 
 export type RootStackParamList = {
   MyEvents: undefined;
@@ -39,6 +40,28 @@ export const Navigation = () => {
             headerLeft: () => {
               return <View></View>;
             },
+          }}
+        />
+        <RootStack.Screen
+          name="Event"
+          component={Event}
+          initialParams={{
+            ticketEventAssetId: {
+              ticketEvent: {
+                creatorName: "",
+                description: "",
+                endDate: "",
+                imageUrl: "",
+                location: "",
+                price: 0,
+                startDate: "",
+                title: "",
+              },
+              assetId: 0,
+            },
+          }}
+          options={{
+            title: "",
           }}
         />
       </RootStack.Navigator>
