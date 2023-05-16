@@ -19,6 +19,11 @@ import { getFileFromPinata } from "../../rest/ipfs";
 import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 import { BarCodeScanner } from "expo-barcode-scanner";
+import {
+  SignedMessage,
+  SignedMessageSimplified,
+} from "../../entities/SignedMessage";
+import { verifyMessage } from "../../algorand/verifyMessage";
 
 interface Props {
   navigation: NavigationRoute["navigation"];
@@ -51,8 +56,23 @@ export const Event = (props: Props) => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    alert("QRcode scanned" + data);
-    setIsScannerOpen(false);
+    try {
+      const verifyDataSimplified: SignedMessageSimplified = JSON.parse(data);
+
+      const verifyData: SignedMessage = {
+        message: Uint8Array.from(verifyDataSimplified.message),
+        publicKey: verifyDataSimplified.publicKey,
+        signature: Uint8Array.from(verifyDataSimplified.signature),
+      };
+
+      const verifyResult = verifyMessage(verifyData);
+
+      alert("Signature is valid:" + verifyResult);
+
+      setIsScannerOpen(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
