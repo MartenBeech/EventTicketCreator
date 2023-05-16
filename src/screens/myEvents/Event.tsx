@@ -51,7 +51,7 @@ export const Event = (props: Props) => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    alert("QRcode scanned");
+    alert("QRcode scanned" + data);
     setIsScannerOpen(false);
   };
 
@@ -77,8 +77,12 @@ export const Event = (props: Props) => {
     <View style={styles.container}>
       <BarCodeScanner
         onBarCodeScanned={handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+        barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+        style={[styles.cameraContainer]}
       />
+      <View style={styles.viewfinderContainer}>
+        <View style={styles.viewfinder} />
+      </View>
       <Button title="Close scanner" onPress={() => setIsScannerOpen(false)} />
     </View>
   ) : (
@@ -181,5 +185,23 @@ const styles = StyleSheet.create({
   ticketsCounter: {
     fontSize: 12,
     fontStyle: "italic",
+  },
+  cameraContainer: {
+    alignItems: "center",
+    height: "80%",
+  },
+  viewfinderContainer: {
+    alignItems: "center",
+    position: "absolute",
+    height: "80%",
+    width: "100%",
+    justifyContent: "center",
+  },
+  viewfinder: {
+    width: 200,
+    height: 200,
+    borderWidth: 2,
+    borderColor: "white",
+    borderRadius: 10,
   },
 });
