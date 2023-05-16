@@ -5,6 +5,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  Button,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
@@ -17,6 +18,7 @@ import { useEffect, useState } from "react";
 import { getFileFromPinata } from "../../rest/ipfs";
 import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 interface Props {
   navigation: NavigationRoute["navigation"];
@@ -24,6 +26,9 @@ interface Props {
 }
 
 export const Event = (props: Props) => {
+  const [hasPermission, setHasPermission] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
   const ticketEventAssetId = props.route.params.ticketEventAssetId;
   const ticketEvent = ticketEventAssetId.ticketEvent;
 
@@ -31,6 +36,24 @@ export const Event = (props: Props) => {
   const [ticketsSold, setTicketsSold] = useState(0);
   const [image, setImage] = useState("");
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+
+      if (status !== "granted") {
+        alert("Camera permission is not granted");
+      }
+    };
+
+    getBarCodeScannerPermissions();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    alert("QRcode scanned");
+    setIsScannerOpen(false);
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -50,7 +73,15 @@ export const Event = (props: Props) => {
     }
   }, []);
 
-  return (
+  return isScannerOpen ? (
+    <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      <Button title="Close scanner" onPress={() => setIsScannerOpen(false)} />
+    </View>
+  ) : (
     <ScrollView>
       <Image
         style={styles.image}
@@ -76,8 +107,13 @@ export const Event = (props: Props) => {
             Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
           </Text>
         </View>
-        <Pressable style={styles.buyTicketButton} onPress={async () => {}}>
-          <Text style={styles.buyTicketText}>Verify Tickets</Text>
+        <Pressable
+          style={styles.buyTicketButton}
+          onPress={async () => {
+            setIsScannerOpen(true);
+          }}
+        >
+          <Text style={styles.buyTicketText}>Check Tickets</Text>
         </Pressable>
         <View style={styles.ticketsCounterContainer}>
           <Text style={styles.ticketsCounter}>{ticketsLeft} tickets left</Text>
