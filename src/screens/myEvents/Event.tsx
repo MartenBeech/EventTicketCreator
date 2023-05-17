@@ -24,6 +24,7 @@ import {
   SignedMessageSimplified,
 } from "../../entities/SignedMessage";
 import { verifyMessage } from "../../algorand/verifyMessage";
+import algosdk from "algosdk";
 
 interface Props {
   navigation: NavigationRoute["navigation"];
@@ -55,7 +56,7 @@ export const Event = (props: Props) => {
     getBarCodeScannerPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     try {
       const verifyDataSimplified: SignedMessageSimplified = JSON.parse(data);
 
@@ -65,9 +66,18 @@ export const Event = (props: Props) => {
         signature: Uint8Array.from(verifyDataSimplified.signature),
       };
 
-      const verifyResult = verifyMessage(verifyData);
+      const isMessageValid = verifyMessage(verifyData);
 
-      alert("Signature is valid:" + verifyResult);
+      if (isMessageValid) {
+        alert("message is valid!");
+        const assetAmount = await getAssetAmountFromAccount(
+          verifyData.publicKey,
+          ticketEventAssetId.assetId
+        );
+        alert(
+          "wallet " + verifyData.publicKey + "has " + assetAmount + "tickets"
+        );
+      }
 
       setIsScannerOpen(false);
     } catch (error) {
