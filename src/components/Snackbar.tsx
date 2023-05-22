@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import { Snackbar as Snack } from "react-native-paper";
 
 export type SnackbarColor = "green" | "red";
@@ -25,9 +24,7 @@ export const Snackbar = (props: Props) => {
         onPress: () => props.setTextState(""),
       }}
     >
-      <View>
-        <Text>{props.textState}</Text>
-      </View>
+      {props.textState}
     </Snack>
   );
 };
