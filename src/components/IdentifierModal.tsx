@@ -46,8 +46,7 @@ export const IdentifierModal = () => {
               if (username.length < 3 || username.length > 20) {
                 alert("Username has to be between 3-20 characters");
               } else {
-                const account = await createAccount();
-                console.log(account);
+                await createAccount();
                 setStorePair(key_username, username);
                 getAlgoTransaction();
 

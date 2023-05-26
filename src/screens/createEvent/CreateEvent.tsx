@@ -63,7 +63,6 @@ export const CreateEvent = (props: Props) => {
       setIsLoading(false);
       return;
     }
-    console.log("Image CID after create event: " + IpfsCid);
     const ticketEvent: TicketEvent = {
       creatorName: await getStoreValue(key_username),
       description,
@@ -76,14 +75,12 @@ export const CreateEvent = (props: Props) => {
     };
     const eventCID = await uploadTicketEventToPinata(ticketEvent);
 
-    console.log("Event CID after create Event: " + eventCID);
     if (!eventCID) {
       setSnackBarColor("red");
       setSnackBarText("Failed uploading event to Pinata");
       setIsLoading(false);
       return;
     }
-    console.log(eventCID);
     const createAssetTransactionResult = await createAssetTransaction(
       title,
       `ipfs/${eventCID}`,

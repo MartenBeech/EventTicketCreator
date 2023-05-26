@@ -63,7 +63,6 @@ export const MyEvents = (props: Props) => {
             };
           })
         );
-        console.log(events);
         setEvents(events);
         setIsLoading(false);
       };

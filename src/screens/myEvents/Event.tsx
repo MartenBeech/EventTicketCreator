@@ -24,7 +24,6 @@ import {
   SignedMessageSimplified,
 } from "../../entities/SignedMessage";
 import { verifyMessage } from "../../algorand/verifyMessage";
-import algosdk from "algosdk";
 
 interface Props {
   navigation: NavigationRoute["navigation"];
@@ -81,7 +80,7 @@ export const Event = (props: Props) => {
 
       setIsScannerOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
