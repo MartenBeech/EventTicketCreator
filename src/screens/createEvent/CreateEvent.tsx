@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Image, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Image } from "react-native";
 import { NavigationBar } from "../../NavigationBar";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
@@ -15,7 +15,7 @@ import { DateButton } from "../../components/DateButton";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
 import { getStoreValue } from "../../store";
-import { key_address, key_username } from "../../constants";
+import { key_username } from "../../constants";
 import { createAssetTransaction } from "../../rest/algorand";
 import {
   convertHourMinuteToUTC,
@@ -66,11 +66,11 @@ export const CreateEvent = (props: Props) => {
     const ticketEvent: TicketEvent = {
       creatorName: await getStoreValue(key_username),
       description,
-      endDate,
+      endDate: `${endDate} ${endTime}`,
       imageUrl: IpfsCid,
       location,
       price: 0,
-      startDate,
+      startDate: `${startDate} ${startTime}`,
       title,
     };
     const eventCID = await uploadTicketEventToPinata(ticketEvent);
