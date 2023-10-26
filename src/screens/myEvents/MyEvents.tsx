@@ -26,13 +26,11 @@ interface Props {
 
 export const MyEvents = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
       const getAssetUrlsFromAccount = async () => {
-        setIsLoading(true);
         const address = await getStoreValue(key_address);
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
 
@@ -64,7 +62,6 @@ export const MyEvents = (props: Props) => {
           })
         );
         setEvents(events);
-        setIsLoading(false);
       };
       getAssetUrlsFromAccount();
     }
@@ -72,8 +69,7 @@ export const MyEvents = (props: Props) => {
 
   return (
     <View style={styles.screen}>
-      {isLoading && <Spinner />}
-      {!events.length && !isLoading && (
+      {!events.length && (
         <View style={styles.textContainer}>
           <Text style={styles.text}>You have no active events</Text>
         </View>
