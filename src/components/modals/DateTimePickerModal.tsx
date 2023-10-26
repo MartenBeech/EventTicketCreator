@@ -4,7 +4,7 @@ import {
   convertUTCToHourMinute,
   convertUTCToYearMonthDate,
   convertYearMonthDateToUTC,
-} from "../service/dateTime";
+} from "../../service/dateTime";
 
 export type dateTimeType =
   | "startDate"

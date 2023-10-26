@@ -7,9 +7,9 @@ import {
   View,
   TextInput,
 } from "react-native";
-import { key_mnemonic, key_username } from "../constants";
-import { createAccount, getAlgoTransaction } from "../rest/algorand";
-import { getStoreValue, setStorePair } from "../store";
+import { key_mnemonic, key_username } from "../../constants";
+import { createAccount, getAlgoTransaction } from "../../rest/algorand";
+import { getStoreValue, setStorePair } from "../../store";
 
 export const IdentifierModal = () => {
   const [modalVisible, setModalVisible] = useState(false);

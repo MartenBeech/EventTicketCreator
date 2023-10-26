@@ -113,7 +113,7 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.eventticketcreator"
+    namespace 'com.morfre.eventticketcreator'
     defaultConfig {
         applicationId 'com.morfre.eventticketcreator'
         minSdkVersion rootProject.ext.minSdkVersion

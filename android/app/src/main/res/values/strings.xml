@@ -2,4 +2,7 @@
   <string name="app_name">EventTicketCreator</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
+  <string name="facebook_app_id">1105014064206736</string>
+  <string name="facebook_client_token">a3e9c1780f49dd89c767009af622c599</string>
+  <string name="fb_login_protocol_scheme">fb1105014064206736</string>
 </resources>

@@ -10,7 +10,7 @@ import { Button } from "../../components/Button";
 import {
   DateTimePickerModal,
   dateTimeType,
-} from "../../components/DateTimePickerModal";
+} from "../../components/modals/DateTimePickerModal";
 import { DateButton } from "../../components/DateButton";
 import { uploadFileToPinata, uploadTicketEventToPinata } from "../../rest/ipfs";
 import { TicketEvent } from "../../entities/ticketEvent";
@@ -23,6 +23,9 @@ import {
 } from "../../service/dateTime";
 import { Snackbar, SnackbarColor } from "../../components/Snackbar";
 import { Spinner } from "../../components/Spinner";
+import { FacebookSelectEventModal } from "../../components/modals/FacebookSelectEventModal";
+
+import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
@@ -48,6 +51,7 @@ export const CreateEvent = (props: Props) => {
   const [snackBarText, setSnackBarText] = useState("");
   const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFacebookModalOpen, setIsFacebookModalOpen] = useState(false);
 
   const onSubmit = async () => {
     if (!imageUri || !title) {
@@ -97,6 +101,48 @@ export const CreateEvent = (props: Props) => {
     setIsLoading(false);
   };
 
+  const onImportFromFacebook = async () => {
+    await loginWithFacebook();
+    setIsFacebookModalOpen(true);
+  };
+  const onSubmitFacebook = async () => {};
+  const onCancelFacebook = async () => {
+    setIsFacebookModalOpen(false);
+  };
+
+  const loginWithFacebook = async () => {
+    try {
+      // NOTE: 'public_profile' and 'email' are default permissions, no need to add them
+      const result = await LoginManager.logInWithPermissions([
+        "public_profile",
+        "email",
+      ]);
+
+      if (result.isCancelled) {
+        console.log("User cancelled the login process");
+        return;
+      }
+
+      console.log(
+        "Login was successful with permissions:",
+        result.grantedPermissions!!.toString()
+      );
+
+      // Get the access token
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data) {
+        console.log("Something went wrong obtaining the access token");
+        return;
+      }
+
+      const accessToken = data.accessToken.toString();
+      // You can now use this access token to make API calls
+    } catch (error) {
+      console.log("Login failed with error:", error);
+    }
+  };
+
   return (
     <View style={styles.screen}>
       {isLoading && <Spinner />}
@@ -137,6 +183,15 @@ export const CreateEvent = (props: Props) => {
         />
       )}
       <ScrollView>
+        <FacebookSelectEventModal
+          isVisible={isFacebookModalOpen}
+          onCancel={onCancelFacebook}
+          onConfirm={onSubmitFacebook}
+        />
+        <Button
+          title="Import from facebook"
+          onPress={() => onImportFromFacebook()}
+        />
         <View style={styles.container}>
           <Image
             style={styles.image}
