@@ -22,7 +22,11 @@ export const uploadFileToPinata = async (imageUri: string): Promise<string> => {
     return res.data.IpfsHash;
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      console.log("Axios request failed in uploading file to ipfs", err.response?.data, err.toJSON());
+      console.log(
+        "Axios request failed in uploading file to ipfs",
+        err.response?.data,
+        err.toJSON()
+      );
     } else {
       console.error(err);
     }
@@ -31,7 +35,7 @@ export const uploadFileToPinata = async (imageUri: string): Promise<string> => {
 };
 
 export const getFileFromPinata = async (IpfsHash: string) => {
-  const response = await fetch(`${IPFSUrlPrefix}/ipfs/${IpfsHash}`);
+  const response = await fetch(`${IPFSUrlPrefix}ipfs/${IpfsHash}`);
   const data = await response.json();
   const file = `data:image;base64,${data.file}`;
   return file;
@@ -75,14 +79,18 @@ export const getIPFSEventData = async (url: string) => {
     title: "",
   };
   try {
-    const response = await axios.get(`${IPFSUrlPrefix}/${url}`);
+    const response = await axios.get(`${IPFSUrlPrefix}${url}`);
     const data = response.data;
     if (data) {
       returnData = data;
     }
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      console.log("Axios request failed for ipfs", err.response?.data, err.toJSON());
+      console.log(
+        "Axios request failed for ipfs",
+        err.response?.data,
+        err.toJSON()
+      );
     } else {
       console.error(err);
     }
